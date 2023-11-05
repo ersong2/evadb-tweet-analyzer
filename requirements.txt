@@ -1,0 +1,4 @@
+evadb>=0.3.4
+openai>=0.27.8
+youtube_transcript_api>=0.6.0
+tweepy
