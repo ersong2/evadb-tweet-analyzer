@@ -4,6 +4,8 @@
 This app lets you search for tweets with a certain keyword/query, and store them in a MySQL database. 
 It requires a Twitter API key and a MySQL server.
 
+In the future, it is planned for this app to be able to perform sentiment analysis and trend tracking on the collected tweets, as well as answer questions about them using a language model.
+
 This app is powered by [EvaDB](https://github.com/georgia-tech-db/eva), a Python-based database system for AI applications developed by Georgia Tech's DB Group.
 
 ## Credts
