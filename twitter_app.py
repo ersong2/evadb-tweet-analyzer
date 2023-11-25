@@ -1,7 +1,5 @@
 # Import the EvaDB package
 import evadb
-
-import mysql.connector
 import tweepy
 import datetime
 
@@ -20,10 +18,10 @@ if __name__ == "__main__":
         print(e)
         print("These Twitter API credentials don't seem to work...")
 
-    # create mysql database using connector
-    print("Please enter the MySQL host you would like to connect to:")
+    # create Postgres database using connector
+    print("Please enter the Postgres host you would like to connect to:")
     host = input()
-    print("Please enter the MySQL user you would like to connect:")
+    print("Please enter the Postgres user you would like to connect:")
     user = input()
     print("Please enter your desired port number:")
     port = input()
@@ -33,23 +31,6 @@ if __name__ == "__main__":
     database = input()
 
 
-    # mysql connector probably not necessary, but i will keep this code here in case i need it later
-    '''
-    mysqldb = mysql.connector.connect(
-        host=host, user=user,password=password,database=database
-    )
-    mysqlcursor = mysqldb.cursor()
-    mysqlcursor.execute("CREATE DATABASE IF NOT EXISTS eva_twitter_test")
-    mysqlcursor.execute("CREATE TABLE IF NOT EXISTS tweets (id INTEGER UNIQUE, name VARCHAR(50), screenname VARCHAR(15), text VARCHAR(280), timestamp DATETIME, rtwts INT, likes INT);")
-
-    # search for tweets and commit to mysql db
-    for tweet in tweets:
-        mysqlcursor.execute("INSERT INTO tweets (id, name, screenname, text, timestamp, rtwts, likes) VALUES ("
-                            + tweet.id + ", "+tweet.user.name+ ", "+tweet.user.username+", "+tweet.text+", "
-                            + tweet.created_at + ", " + tweet.retweet_count + ", " + tweet.favorite_count +
-                            ")")
-    mysqldb.commit()
-    '''
     # take tweet search query
     print("What search query would you like to search twitter for?")
     search_query = input()
@@ -64,12 +45,12 @@ if __name__ == "__main__":
 
     # create EvaDB database
     try:
-        print(evacursor.query("CREATE DATABASE IF NOT EXISTS eva_twitter_test WITH ENGINE = 'mysql', PARAMETERS = {\"user\":\""
+        print(evacursor.query("CREATE DATABASE IF NOT EXISTS " + database + " WITH ENGINE = 'postgres', PARAMETERS = {\"user\":\""
                               + user + "\", \"password\":\"" + password + "\", \"host\":\"" + host + "\", \"port\":\"" + port
                               + "\", \"database\":\"" + database + "\"};").df())
     except Exception as e:
         print(e)
-        print("Failed to create EvaDB database  - did you input the correct MySQL credentials?")
+        print("Failed to create EvaDB database  - did you input the correct Postgres credentials?")
     # timestamp as text because evadb seems not to support datetime format
     # YYYY-MM-DD_HH:MM:SS is exactly 19 characters
     print(evacursor.query("CREATE TABLE IF NOT EXISTS tweets (id INTEGER UNIQUE, name TEXT(50), screenname TEXT(15), text TEXT(280), timestamp TEXT(19), rtwts INTEGER, likes INTEGER)").df())
@@ -82,18 +63,18 @@ if __name__ == "__main__":
     except Exception as e:
         print(e)
         print("Insertion failed - either no list of tweets to insert or database does not exist. Did your search query or databse creation fail?")
-
-    # dead testing code - but it would work
+    # dead testing code for dummy data
     '''
+
     print(evacursor.query("INSERT INTO tweets (id, name, screenname, text, timestamp, rtwts, likes) VALUES ("
                           + "1" + ", \"" + "test_name" + "\", \"" + "test_username" + "\", \""
-                          + "placeholder_text" + "\", \"" + datetime.datetime(2023,10,17,15,30,0).strftime("%Y-%m-%d %H:%M:%S") + "\", "
+                          + "feeling like trash right now" + "\", \"" + datetime.datetime(2023,10,17,15,30,0).strftime("%Y-%m-%d %H:%M:%S") + "\", "
                           + "1" + ", " + "1" + ")").df())
-    print(evacursor.query("SELECT * from tweets").df())
-    '''
+    print(evacursor.query("INSERT INTO tweets (id, name, screenname, text, timestamp, rtwts, likes) VALUES ("
+                          + "1" + ", \"" + "test_name" + "\", \"" + "test_username" + "\", \""
+                          + "good morning!" + "\", \"" + datetime.datetime(2023, 10, 17, 15, 30, 0).strftime("%Y-%m-%d %H:%M:%S") + "\", "
+                          + "1" + ", " + "1" + ")").df())
 
-    # code syntax is correct but sentiment analysis currently will not work
-    # will need to learn postgres and switch from MySQL
     '''
     try:
         print("Performing sentiment analysis...")
@@ -103,4 +84,3 @@ if __name__ == "__main__":
     except Exception as e:
         print(e)
         print("Sentiment analysis failed")
-    '''
